@@ -44,6 +44,7 @@
 # Composer PHAR
 /composer.phar
 /phpunit.phar
+/phpmd.phar
 
 # Backup entities generated with doctrine:generate:entities command
 */Entity/*~
