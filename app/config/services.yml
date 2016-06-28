@@ -4,6 +4,12 @@ parameters:
 #    parameter_name: value
 
 services:
+  redis.instance:
+    class: Redis
+
+  redis.service:
+    class: AppBundle\Service\RedisService
+    arguments: ['@redis.instance']
 #    service_name:
 #        class: AppBundle\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]

@@ -23,53 +23,52 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Service\RedisService;
+use stdClass;
+use AppBundle\Entity\StringEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class DefaultController extends Controller
+/**
+ * Class StringController
+ * @package AppBundle\Controller
+ */
+class StringController extends Controller
 {
     /**
-     * @Route("/", name="homepage")
-     */
-    public function indexAction(Request $request)
-    {
-        /** @var RedisService $redis */
-        $redis = $this->get('redis.service');
-        $parameters = ['redis' => ['info' => $redis->info(), 'online' => $redis->ping(), 'keys' => $redis->keys('*')]];
-
-        
-//        $form = $this->createFormBuilder()
-//            ->add('key', TextType::class)
-//            ->add('value', TextType::class)
-//            ->add('send', SubmitType::class)
-//            ->setAction("string/add")
-//            ->getForm();
-//
-//        $form->handleRequest($request);
-//
-//        if ($form->isSubmitted() && $form->isValid()) {
-//            // ... perform some action, such as saving the task to the database
-//            var_dump($form->getData());exit;
-//            return $this->redirectToRoute('task_success');
-//        }
-//
-//        $parameters["form"] = $form->createView();
-
-        return $this->render('default/index.html.twig', $parameters);
-    }
-
-    /**
-     * @Route("/ping", name="ping")
+     * @Route("/string/add", name="string-add")
      * @Method({"POST"})
      */
-    public function pingAction()
+    public function addAction(Request $request)
     {
+        $form = $this->createFormBuilder(new StringEntity())
+            ->add('key', TextType::class)
+            ->add('value', TextType::class)
+            ->add('ttl', NumberType::class)
+            ->add('send', SubmitType::class)
+            ->getForm();
 
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var StringEntity $dataset */
+            $dataset = $form->getData();
+
+
+            /** @var RedisService $redis */
+            $redis = $this->get("redis.service");
+            var_dump($redis->setx($dataset->getKey(), $dataset->getTtl(), $dataset->getValue()));
+            
+        }
+
+
+        return new Response("bla");
+
+        // ... render the form
     }
 }
